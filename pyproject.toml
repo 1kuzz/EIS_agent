@@ -1,0 +1,10 @@
+[project]
+name = "eis-parser"
+version = "0.1.0"
+description = "Universal procurement parser"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+[project.scripts]
+eis-parser = "eis_parser.universal_parser:main"

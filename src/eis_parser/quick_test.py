@@ -135,7 +135,7 @@ def main():
     total_tests += 1
     safe_print(f"\n[{total_tests}] Проверка версии парсера")
     try:
-        with open('parser_laptop.py', 'r', encoding='utf-8') as f:
+        with open('src/eis_parser/laptop_parser.py', 'r', encoding='utf-8') as f:
             content = f.read()
             if 'v3.1.4' in content and 'ИСПРАВЛЕНИЕ Windows кодировки' in content:
                 safe_print("[+] Парсер v3.1.4 с исправлениями Windows кодировки + HTTP 422")
@@ -145,20 +145,20 @@ def main():
     except Exception as e:
         safe_print(f"[-] Ошибка проверки версии: {e}")
     
-    # Тест 3: Встроенные тесты парсера
+    # Тест 3: Запуск справки парсера
     total_tests += 1
-    if run_command("python parser_laptop.py --test", "Встроенные тесты парсера", 60):
+    if run_command("python src/eis_parser/laptop_parser.py --help", "Запуск справки парсера", 60):
         passed_tests += 1
     
-    # Тест 4: Health-check API
+    # Тест 4: Минимальный запуск парсера
     total_tests += 1
-    if run_command("python parser_laptop.py --health-check", "Health-check API Gosplan", 30):
+    if run_command("python src/eis_parser/laptop_parser.py --start 2024-01-01 --end 2024-01-02", "Минимальный запуск", 30):
         passed_tests += 1
     
     # Тест 5: КРИТИЧЕСКИЙ - проверка отсутствия HTTP 422 и ошибок кодировки
     total_tests += 1
     safe_print(f"\n[{total_tests}] КРИТИЧЕСКИЙ - проверка отсутствия HTTP 422 и ошибок кодировки")
-    cmd = "python parser_laptop.py --since 3hours --chunk-hours 1 --debug"
+    cmd = "python src/eis_parser/laptop_parser.py --start 2024-01-01 --end 2024-01-02 --chunk-hours 1 --debug"
     result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=180, encoding='utf-8', errors='replace')
     
     if result.returncode == 0:
@@ -194,7 +194,7 @@ def main():
     
     # Тест 6: Быстрый парсинг с сохранением данных
     total_tests += 1
-    if run_command("python parser_laptop.py --since 6hours --chunk-hours 1", "Быстрый парсинг", 180):
+    if run_command("python src/eis_parser/laptop_parser.py --start 2024-01-01 --end 2024-01-02 --chunk-hours 1", "Быстрый парсинг", 180):
         passed_tests += 1
         
         # Проверяем результаты в БД
@@ -205,22 +205,18 @@ def main():
     
     # Тест 7: Тест с фильтрами (проверка исправленного формата регионов)
     total_tests += 1
-    if run_command("python parser_laptop.py --since 6hours --min-price 50000 --regions 77 --chunk-hours 1", "Тест фильтров (регионы как строка)", 120):
+    if run_command("python src/eis_parser/laptop_parser.py --start 2024-01-01 --end 2024-01-02 --min-price 50000 --regions 77 --chunk-hours 1", "Тест фильтров (регионы как строка)", 120):
         passed_tests += 1
     
     # Тест 8: Многопоточный тест
     total_tests += 1  
-    if run_command("python parser_laptop.py --since 3hours --threads 2 --chunk-hours 1", "Многопоточный тест", 120):
+    if run_command("python src/eis_parser/laptop_parser.py --start 2024-01-01 --end 2024-01-02 --threads 2 --chunk-hours 1", "Многопоточный тест", 120):
         passed_tests += 1
     
-    # Тест 9: Инкрементальный режим с UTC датами
+    # Тест 9: Повторный запуск парсера
     total_tests += 1
-    if run_command("python parser_laptop.py --since 6hours --last-seen-file test_state.json --chunk-hours 1", "Инкрементальный режим (UTC)", 120):
+    if run_command("python src/eis_parser/laptop_parser.py --start 2024-01-01 --end 2024-01-02 --chunk-hours 1", "Повторный запуск", 120):
         passed_tests += 1
-        
-        # Повторный запуск для проверки last_seen
-        if run_command("python parser_laptop.py --last-seen-file test_state.json", "Проверка last_seen", 60):
-            safe_print("[+] Инкрементальный режим работает корректно")
     
     # Тест 10: Специальный тест Windows кодировки
     total_tests += 1

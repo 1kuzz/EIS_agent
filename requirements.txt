@@ -1,0 +1,7 @@
+requests
+urllib3
+pyyaml
+openpyxl
+requests-cache
+tqdm
+aiohttp

@@ -141,7 +141,7 @@ class CategoryConfig:
 class ConfigLoader:
     """Загрузчик конфигурации с объединением YAML + CLI"""
     
-    def __init__(self, config_path: str = "categories.yml"):
+    def __init__(self, config_path: str = "config/categories.yml"):
         self.config_path = config_path
         self.categories = {}
         self.load_yaml_config()
@@ -1406,7 +1406,7 @@ def main():
     parser = argparse.ArgumentParser(description="Универсальный парсер закупок v11.0")
     parser.add_argument('--category', type=str, default='all', 
                        help="Категория товаров или 'all' для всех")
-    parser.add_argument('--config', type=str, default='categories.yml',
+    parser.add_argument('--config', type=str, default='config/categories.yml',
                        help="Путь к YAML конфигу")
     parser.add_argument('--start', type=str, help="Начало периода (YYYY-MM-DD)")
     parser.add_argument('--end', type=str, help="Конец периода (YYYY-MM-DD)")
