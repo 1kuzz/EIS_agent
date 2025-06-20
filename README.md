@@ -2,6 +2,11 @@
 
 🚀 **Максимальная производительность и надежность** - парсер поддерживает любые категории товаров через YAML-конфигурацию с турбо-оптимизациями.
 
+## 📁 Структура проекта
+- `src/` содержит исходный код в пакете `eis_parser`
+- `config/categories.yml` — конфигурация категорий
+- `src/main.py` — точка входа для универсального парсера
+
 ## 🔥 Новые ТУРБО возможности v12.0
 
 ### ⚡ Производительность
@@ -24,20 +29,21 @@
 ### 1. Установка зависимостей
 
 ```bash
-pip install requests urllib3 pyyaml openpyxl requests-cache
+pip install -r requirements.txt
+pip install -e .  # optional, for CLI entrypoint
 ```
 
 ### 2. Базовое использование
 
 ```bash
 # Парсинг всех категорий за последний день
-python parser.py
+python src/main.py
 
 # Парсинг конкретной категории за период
-python parser.py --category laptop --start 2024-01-01 --end 2024-12-31
+python src/main.py --category laptop --start 2024-01-01 --end 2024-12-31
 
 # С экспортом в Excel
-python parser.py --category monitor --start 2024-06-01 --xlsx
+python src/main.py --category monitor --start 2024-06-01 --xlsx
 ```
 
 ## 📋 Основные возможности
@@ -70,7 +76,7 @@ python parser.py --category monitor --start 2024-06-01 --xlsx
 | Параметр | Описание | Пример |
 |----------|----------|--------|
 | `--category` | Категория или 'all' | `--category laptop` |
-| `--config` | Путь к YAML конфигу | `--config my_categories.yml` |
+| `--config` | Путь к YAML конфигу | `--config config/categories.yml` |
 | `--start` | Дата начала (YYYY-MM-DD) | `--start 2024-01-01` |
 | `--end` | Дата окончания (YYYY-MM-DD) | `--end 2024-12-31` |
 | `--min-price` | Минимальная цена | `--min-price 50000` |
@@ -89,37 +95,37 @@ python parser.py --category monitor --start 2024-06-01 --xlsx
 ### Максимальная производительность для больших объемов
 ```bash
 # Асинхронный режим с chunked периодами и progress bar
-python parser.py --category all --async --chunk-hours 3 --threads 16 --progress
+python src/main.py --category all --async --chunk-hours 3 --threads 16 --progress
 ```
 
 ### Региональная специализация  
 ```bash
 # Только дорогие ноутбуки в Москве и СПб
-python parser.py --category laptop --regions 77 78 --min-price 100000 --progress
+python src/main.py --category laptop --regions 77 78 --min-price 100000 --progress
 
 # Серверы только в Москве
-python parser.py --category server --regions 77 --min-price 200000 --chunk-hours 6
+python src/main.py --category server --regions 77 --min-price 200000 --chunk-hours 6
 ```
 
 ### Быстрое восстановление после сбоев
 ```bash
 # Теплое сохранение: при сбое теряется максимум один батч
-python parser.py --category all --chunk-hours 1 --progress
+python src/main.py --category all --chunk-hours 1 --progress
 # При прерывании просто перезапустите - все сохраненные данные останутся
 ```
 
 ### Отладка и мониторинг
 ```bash
 # Последовательная обработка с детальным логированием
-python parser.py --category laptop --threads 1 --debug --progress
+python src/main.py --category laptop --threads 1 --debug --progress
 
 # Chunked режим для диагностики API лимитов
-python parser.py --category monitor --chunk-hours 1 --debug
+python src/main.py --category monitor --chunk-hours 1 --debug
 ```
 
 ## ⚙️ Конфигурация категорий
 
-Файл `categories.yml` содержит настройки для каждой категории:
+Файл `config/categories.yml` содержит настройки для каждой категории:
 
 ```yaml
 laptop:
@@ -155,11 +161,11 @@ laptop_moscow_spb:
 
 ### Добавление новой категории
 
-1. Откройте `categories.yml`
+1. Откройте `config/categories.yml`
 2. Добавьте новую секцию с уникальным именем
 3. Укажите коды КТРУ/ОКПД2 для поиска
 4. Настройте ключевые слова и характеристики
-5. Запустите парсер: `python parser.py --category новая_категория`
+5. Запустите парсер: `python src/main.py --category новая_категория`
 
 ## 📈 Статистика и отчеты
 
@@ -210,7 +216,7 @@ WHERE p.param_name LIKE '%диагональ%' AND p.param_value LIKE '%15%';
 ```bash
 #!/bin/bash
 # daily_parsing.sh
-python parser.py --category all --threads 10 --xlsx
+python src/main.py --category all --threads 10 --xlsx
 ```
 
 ### Cron задача (каждый день в 6:00)
@@ -227,7 +233,7 @@ python parser.py --category all --threads 10 --xlsx
 - Можно уменьшить количество потоков: `--threads 2`
 
 **2. Нет данных для категории**
-- Проверьте правильность кодов КТРУ в `categories.yml`
+- Проверьте правильность кодов КТРУ в `config/categories.yml`
 - Убедитесь что ключевые слова соответствуют реальным названиям
 
 **3. Медленная работа**
@@ -238,10 +244,10 @@ python parser.py --category all --threads 10 --xlsx
 
 ```bash
 # Подробные логи
-python parser.py --category laptop --debug
+python src/main.py --category laptop --debug
 
 # Последовательная обработка для отладки
-python parser.py --category laptop --threads 1 --debug
+python src/main.py --category laptop --threads 1 --debug
 ```
 
 ## 📝 Формат экспорта
@@ -273,7 +279,7 @@ python parser.py --category laptop --threads 1 --debug
 ```bash
 pip install requests urllib3 pyyaml openpyxl requests-cache tqdm aiohttp
 
-python parser.py \
+python src/main.py \
   --category all \
   --async \
   --chunk-hours 3 \
